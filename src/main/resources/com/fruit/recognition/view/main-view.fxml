@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fruit.recognition.controller.MainViewController">
+    <children>
+        <ImageView fitHeight="550.0" fitWidth="480.0" pickOnBounds="true">
+            <image>
+                <Image url="@../images/bg.jpg" />
+            </image>
+        </ImageView>
+        <ComboBox fx:id="activation" focusTraversable="false" layoutX="146.0" layoutY="363.0" prefHeight="25.0" prefWidth="121.0" />
+        <Label layoutX="41.0" layoutY="365.0" text="Activation">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font>
+        </Label>
+        <Label layoutX="41.0" layoutY="399.0" text="Neurons">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font>
+        </Label>
+        <TextField fx:id="neurons" focusTraversable="false" layoutX="146.0" layoutY="397.0" prefHeight="25.0" prefWidth="121.0" />
+        <Label layoutX="41.0" layoutY="437.0" text="Learning Rate">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font>
+        </Label>
+        <TextField fx:id="learningRate" focusTraversable="false" layoutX="146.0" layoutY="435.0" prefHeight="25.0" prefWidth="121.0" />
+        <Label layoutX="41.0" layoutY="471.0" text="Epochs">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font>
+        </Label>
+        <TextField fx:id="epochs" focusTraversable="false" layoutX="146.0" layoutY="469.0" prefHeight="25.0" prefWidth="121.0" />
+        <Label layoutX="87.0" layoutY="14.0" text="Fruit Recognition System">
+            <font>
+                <Font name="System Bold" size="25.0" />
+            </font>
+        </Label>
+        <Button focusTraversable="false" layoutX="294.0" layoutY="436.0" mnemonicParsing="false" onAction="#learn" prefHeight="42.0" prefWidth="136.0" styleClass="shiny-yellow" text="Learn" />
+        <Button focusTraversable="false" layoutX="294.0" layoutY="483.0" mnemonicParsing="false" onAction="#test" prefHeight="42.0" prefWidth="136.0" styleClass="shiny-yellow" text="Test" />
+      <Button layoutX="294.0" layoutY="343.0" mnemonicParsing="false" onAction="#loadExcelFile" styleClass="shiny-yellow" text="Load Excel File" />
+      <TableView fx:id="dataTable" layoutX="30.0" layoutY="68.0" prefHeight="250.0" prefWidth="420.0" styleClass="Table-view">
+        <columns>
+          <TableColumn fx:id="fruitType" prefWidth="140.0" text="Fruit" />
+            <TableColumn fx:id="sweetness" prefWidth="140.0" text="Sweetness" />
+          <TableColumn fx:id="color" prefWidth="140.0" text="Color" />
+        </columns>
+      </TableView>
+      <Button layoutX="294.0" layoutY="387.0" mnemonicParsing="false" onAction="#addRow" prefHeight="42.0" prefWidth="136.0" styleClass="shiny-yellow" text="Add Row" />
+    </children>
+   <stylesheets>
+      <URL value="@../css/buttons.css" />
+      <URL value="@../css/table.css" />
+   </stylesheets>
+</AnchorPane>
