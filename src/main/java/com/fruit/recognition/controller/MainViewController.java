@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.fruit.recognition.nn.NeuralNetwork;
+
 import com.fruit.recognition.model.FruitGuiRow;
 
 import com.fruit.recognition.enumeration.Color;
@@ -66,6 +68,17 @@ public class MainViewController implements Initializable
 
     @FXML
     private TextField neurons;
+
+    @FXML
+    private TextField goal;
+
+    @FXML
+    private TextField sweetnessTestField;
+
+    @FXML
+    private ComboBox<String> colorTestBox;
+
+    private final NeuralNetwork neuralNetwork = new NeuralNetwork();
 
     private final ObservableList<FruitGuiRow> fruitRows = FXCollections.observableArrayList();
 
@@ -131,15 +144,102 @@ public class MainViewController implements Initializable
     }
 
     @FXML
-    void learn()
+    void test()
     {
+        if(sweetnessTestField.getText().isBlank())
+        {
+            showDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Messing Sweetness",
+                "Enter Sweetness Value [1-10]"
+            );
 
+            return;
+        }
+
+        double sweetness = Double.parseDouble(sweetnessTestField.getText());
+        int color = Color.valueOf(colorTestBox.getSelectionModel().getSelectedItem()).getValue();
+        neuralNetwork.setActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
+
+        String fruitResult = "";
+
+        double[] input = {sweetness, color};
+        int output = neuralNetwork.predict(input);
+
+        switch (output)
+        {
+            case 0 -> fruitResult = "Fruit: Apple";
+            case 1 -> fruitResult = "Fruit: Banana";
+            case 2 -> fruitResult = "Fruit: Orange";
+            default -> System.out.println("Unknown Result");
+        }
+
+        showDialog(
+            Alert.AlertType.INFORMATION,
+            "Result",
+            "Success",
+            fruitResult
+        );
     }
 
     @FXML
-    void test()
+    void learn()
     {
+        String errorMessage = "";
 
+        if(neurons.getText().isBlank() || Integer.parseInt(neurons.getText()) == 0)
+            errorMessage += "*Messing Neurons Number\n";
+
+        if(learningRate.getText().isBlank() || Double.parseDouble(learningRate.getText()) == 0)
+            errorMessage += "*Messing Learning Rate\n";
+
+        if(epochs.getText().isBlank() || Integer.parseInt(epochs.getText()) == 0)
+            errorMessage += "*Messing Epochs Number\n";
+
+        if(dataTable.getItems().isEmpty())
+            errorMessage += "*Messing Data\n";
+
+        if(!errorMessage.isEmpty())
+        {
+            showDialog(
+                Alert.AlertType.ERROR,
+                "Error",
+                "Something Went Wrong",
+                errorMessage
+            );
+
+            return;
+        }
+
+        neuralNetwork.setEpochs(Integer.parseInt(epochs.getText()));
+        neuralNetwork.setHidden(Integer.parseInt(neurons.getText()));
+        neuralNetwork.setLearningRate(Double.parseDouble(learningRate.getText()));
+        neuralNetwork.setActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
+
+        double[][] input = new double[dataTable.getItems().size()][2];
+        double[][] output = new double[dataTable.getItems().size()][3];
+
+        for(int i = 0 ; i < dataTable.getItems().size() ; i++)
+        {
+            FruitGuiRow row = dataTable.getItems().get(i);
+
+            input[i][0] = Double.parseDouble(row.getSweetness().getText());
+            input[i][1] = Color.valueOf(row.getColor().getSelectionModel().getSelectedItem()).getValue();
+
+            output[i][0] = FruitType.valueOf(row.getFruitType().getSelectionModel().getSelectedItem()) == FruitType.APPLE ? 1 : 0;
+            output[i][1] = FruitType.valueOf(row.getFruitType().getSelectionModel().getSelectedItem()) == FruitType.BANANA ? 1 : 0;
+            output[i][2] = FruitType.valueOf(row.getFruitType().getSelectionModel().getSelectedItem()) == FruitType.ORANGE ? 1 : 0;
+        }
+
+        neuralNetwork.train(input, output);
+
+        showDialog(
+            Alert.AlertType.INFORMATION,
+            "Result",
+            "Operation Done!",
+            "You Can Test A Specific Input"
+        );
     }
 
     private void addFruit(
@@ -171,6 +271,33 @@ public class MainViewController implements Initializable
         dataTable.scrollTo(dataTable.getItems().size());
     }
 
+    @FXML
+    void reset()
+    {
+        fruitRows.clear();
+        dataTable.getItems().clear();
+        dataTable.refresh();
+
+        neuralNetwork.setEpochs(1);
+        neuralNetwork.setHidden(1);
+        neuralNetwork.setLearningRate(0.1);
+        neuralNetwork.setActivation(Activation.TAN);
+
+        epochs.setText("1");
+        neurons.setText("1");
+        learningRate.setText("0.1");
+        sweetnessTestField.setText("1");
+
+        activation.getSelectionModel().selectFirst();
+        colorTestBox.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    void showPerformance()
+    {
+
+    }
+
     private void showDialog(
         Alert.AlertType alertType,
         String title,
@@ -186,7 +313,7 @@ public class MainViewController implements Initializable
         alert.showAndWait();
     }
 
-    private void addValidationOnField(TextField textField, StringConverter stringConverter,String regex, Number defaultValue)
+    private <T> void addValidationOnField(TextField textField, StringConverter<T> stringConverter, String regex, T defaultValue)
     {
         textField.setTextFormatter(new TextFormatter<>(stringConverter, defaultValue, change ->
         {
@@ -202,9 +329,13 @@ public class MainViewController implements Initializable
         activation.getItems().addAll(Arrays.stream(Activation.values()).map(Enum::name).toList());
         activation.getSelectionModel().selectFirst();
 
-        addValidationOnField(learningRate, new DoubleStringConverter(),"0\\.[1-9]|1", 0.1);
-        addValidationOnField(neurons, new IntegerStringConverter(),"[0-9]+", 1);
+        colorTestBox.getItems().addAll(Arrays.stream(Color.values()).map(Enum::name).toList());
+        colorTestBox.getSelectionModel().selectFirst();
+
         addValidationOnField(epochs, new IntegerStringConverter(),"[0-9]+", 1);
+        addValidationOnField(neurons, new IntegerStringConverter(),"[0-9]+", 1);
+        addValidationOnField(learningRate, new DoubleStringConverter(),"0\\.[1-9]|1", 0.1);
+        addValidationOnField(sweetnessTestField, new DoubleStringConverter(),"^(?:[1-9](\\.\\d+)?|10)$", 1.0);
 
         dataTable.setItems(fruitRows);
         fruitType.setCellValueFactory(new PropertyValueFactory<>("fruitType"));

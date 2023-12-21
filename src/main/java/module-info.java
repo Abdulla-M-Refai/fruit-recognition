@@ -16,5 +16,6 @@ module com.example.fruit_recognition {
     exports com.fruit.recognition.controller;
     opens com.fruit.recognition.controller to javafx.fxml;
     exports com.fruit.recognition.nn;
+    exports com.fruit.recognition.enumeration;
     opens com.fruit.recognition.nn to javafx.fxml;
 }

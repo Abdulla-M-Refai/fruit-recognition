@@ -14,7 +14,7 @@ public class Main extends Application
     public void start(Stage stage) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("view/main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 480, 550);
+        Scene scene = new Scene(fxmlLoader.load(), 480, 650);
         stage.getIcons().add(new Image(String.valueOf(getClass().getResource("images/icon.png"))));
         stage.setTitle("Fruit Recognition");
         stage.setResizable(false);
