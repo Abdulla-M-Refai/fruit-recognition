@@ -34,7 +34,6 @@ public class NeuralNetwork
 
     public NeuralNetwork()
     {
-        init();
     }
 
     public void setHiddenActivation(Activation activation)
@@ -44,11 +43,7 @@ public class NeuralNetwork
 
     public void setHidden(int hidden)
     {
-        int prev = this.hidden;
         this.hidden = hidden;
-
-        if(prev != hidden)
-            init();
     }
 
     public void setLearningRate(double learningRate)
@@ -71,7 +66,7 @@ public class NeuralNetwork
         isGoalEnabled = goalEnabled;
     }
 
-    private void init()
+    public void init()
     {
         Random random = new Random();
 

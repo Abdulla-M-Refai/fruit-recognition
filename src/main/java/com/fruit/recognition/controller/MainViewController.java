@@ -226,6 +226,8 @@ public class MainViewController implements Initializable
         if(goalEnable.isSelected())
             neuralNetwork.setGoal(Double.parseDouble(goal.getText()));
 
+        neuralNetwork.init();
+
         double[][] input = new double[dataTable.getItems().size()][2];
         double[][] output = new double[dataTable.getItems().size()][3];
 
