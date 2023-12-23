@@ -11,7 +11,7 @@ public class StepFunctions
         return 1 / (1 + (1 / Math.exp(x)));
     }
 
-    public static double tan(double x)
+    public static double tanh(double x)
     {
         return (2 / (1 + (1 / Math.exp(x * 2)))) - 1;
     }
@@ -29,7 +29,7 @@ public class StepFunctions
         return x * (1 - x);
     }
 
-    public static double tanD(double x)
+    public static double tanhD(double x)
     {
         return 1 - Math.pow(x, 2);
     }

@@ -73,6 +73,9 @@ public class MainViewController implements Initializable
     private TextField goal;
 
     @FXML
+    private CheckBox goalEnable;
+
+    @FXML
     private TextField sweetnessTestField;
 
     @FXML
@@ -160,12 +163,12 @@ public class MainViewController implements Initializable
 
         double sweetness = Double.parseDouble(sweetnessTestField.getText());
         int color = Color.valueOf(colorTestBox.getSelectionModel().getSelectedItem()).getValue();
-        neuralNetwork.setActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
+        neuralNetwork.setHiddenActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
 
         String fruitResult = "";
 
         double[] input = {sweetness, color};
-        int output = neuralNetwork.predict(input);
+        int output = neuralNetwork.test(input);
 
         switch (output)
         {
@@ -197,6 +200,9 @@ public class MainViewController implements Initializable
         if(epochs.getText().isBlank() || Integer.parseInt(epochs.getText()) == 0)
             errorMessage += "*Messing Epochs Number\n";
 
+        if(goalEnable.isSelected() && goal.getText().isBlank())
+            errorMessage += "*Messing Goal Number\n";
+
         if(dataTable.getItems().isEmpty())
             errorMessage += "*Messing Data\n";
 
@@ -215,7 +221,10 @@ public class MainViewController implements Initializable
         neuralNetwork.setEpochs(Integer.parseInt(epochs.getText()));
         neuralNetwork.setHidden(Integer.parseInt(neurons.getText()));
         neuralNetwork.setLearningRate(Double.parseDouble(learningRate.getText()));
-        neuralNetwork.setActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
+        neuralNetwork.setHiddenActivation(Activation.valueOf(activation.getSelectionModel().getSelectedItem()));
+
+        if(goalEnable.isSelected())
+            neuralNetwork.setGoal(Double.parseDouble(goal.getText()));
 
         double[][] input = new double[dataTable.getItems().size()][2];
         double[][] output = new double[dataTable.getItems().size()][3];
@@ -232,13 +241,20 @@ public class MainViewController implements Initializable
             output[i][2] = FruitType.valueOf(row.getFruitType().getSelectionModel().getSelectedItem()) == FruitType.ORANGE ? 1 : 0;
         }
 
-        neuralNetwork.train(input, output);
+        long startTime = System.currentTimeMillis();
+        double []statistics = neuralNetwork.train(input, output);
+        long endTime = System.currentTimeMillis();
+
+        String statisticsMessage =
+            "Time Taken: " + (endTime - startTime) + " ms\n" +
+            "MSE: " + statistics[1] + "\n" +
+            "Accuracy: " + statistics[0];
 
         showDialog(
             Alert.AlertType.INFORMATION,
             "Result",
             "Operation Done!",
-            "You Can Test A Specific Input"
+            statisticsMessage
         );
     }
 
@@ -272,6 +288,13 @@ public class MainViewController implements Initializable
     }
 
     @FXML
+    void goalEnable()
+    {
+        goal.setDisable(!goalEnable.isSelected());
+        neuralNetwork.setGoalEnabled(goalEnable.isSelected());
+    }
+
+    @FXML
     void reset()
     {
         fruitRows.clear();
@@ -281,21 +304,19 @@ public class MainViewController implements Initializable
         neuralNetwork.setEpochs(1);
         neuralNetwork.setHidden(1);
         neuralNetwork.setLearningRate(0.1);
-        neuralNetwork.setActivation(Activation.TAN);
+        neuralNetwork.setHiddenActivation(Activation.TANH);
 
+        goal.setText("0.0");
         epochs.setText("1");
         neurons.setText("1");
         learningRate.setText("0.1");
         sweetnessTestField.setText("1");
 
+        goal.setDisable(true);
+        goalEnable.setSelected(false);
+
         activation.getSelectionModel().selectFirst();
         colorTestBox.getSelectionModel().selectFirst();
-    }
-
-    @FXML
-    void showPerformance()
-    {
-
     }
 
     private void showDialog(
@@ -334,6 +355,7 @@ public class MainViewController implements Initializable
 
         addValidationOnField(epochs, new IntegerStringConverter(),"[0-9]+", 1);
         addValidationOnField(neurons, new IntegerStringConverter(),"[0-9]+", 1);
+        addValidationOnField(goal, new DoubleStringConverter(),"^-?\\d+(\\.\\d+)?$\n", 0.0);
         addValidationOnField(learningRate, new DoubleStringConverter(),"0\\.[1-9]|1", 0.1);
         addValidationOnField(sweetnessTestField, new DoubleStringConverter(),"^(?:[1-9](\\.\\d+)?|10)$", 1.0);
 

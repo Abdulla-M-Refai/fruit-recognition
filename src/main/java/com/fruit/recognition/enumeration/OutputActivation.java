@@ -1,8 +1,7 @@
 package com.fruit.recognition.enumeration;
 
-public enum Activation
+public enum OutputActivation
 {
-    TANH,
-    RELU,
     SIGMOID,
+    SOFTMAX,
 }
