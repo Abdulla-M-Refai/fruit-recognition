@@ -102,9 +102,12 @@ public class NeuralNetwork
         int totalPrediction = 0;
         double sumSquaredError = 0;
 
-        for (int i = 0; i < epochs ; i++)
+        int i;
+        int j;
+
+        for (i = 0; i < epochs ; i++)
         {
-            for (int j = 0; j < input.length; j++)
+            for (j = 0; j < input.length; j++)
             {
                 double[] inputRow = input[j];
                 double[] hiddenNeurons = new double[hidden];
@@ -134,12 +137,16 @@ public class NeuralNetwork
                     sumSquaredError += error * error;
                 }
             }
+
+            double currentAccuracy = (double) correctPrediction / totalPrediction;
+            if (isGoalEnabled && goal > 0 && currentAccuracy >= goal)
+                break;
         }
 
         double mse = sumSquaredError / totalPrediction;
         double accuracy = (double) correctPrediction / totalPrediction;
 
-        return new double[]{accuracy, mse};
+        return new double[]{accuracy, mse, i};
     }
 
     private void calculateError(

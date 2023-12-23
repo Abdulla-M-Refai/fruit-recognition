@@ -200,7 +200,7 @@ public class MainViewController implements Initializable
         if(epochs.getText().isBlank() || Integer.parseInt(epochs.getText()) == 0)
             errorMessage += "*Messing Epochs Number\n";
 
-        if(goalEnable.isSelected() && goal.getText().isBlank())
+        if(goalEnable.isSelected() && (goal.getText().isBlank() || Double.parseDouble(goal.getText()) == 0))
             errorMessage += "*Messing Goal Number\n";
 
         if(dataTable.getItems().isEmpty())
@@ -248,7 +248,8 @@ public class MainViewController implements Initializable
         String statisticsMessage =
             "Time Taken: " + (endTime - startTime) + " ms\n" +
             "MSE: " + statistics[1] + "\n" +
-            "Accuracy: " + statistics[0];
+            "Accuracy: " + statistics[0] + "\n" +
+            "Epoch: " + statistics[2];
 
         showDialog(
             Alert.AlertType.INFORMATION,
@@ -355,8 +356,8 @@ public class MainViewController implements Initializable
 
         addValidationOnField(epochs, new IntegerStringConverter(),"[0-9]+", 1);
         addValidationOnField(neurons, new IntegerStringConverter(),"[0-9]+", 1);
-        addValidationOnField(goal, new DoubleStringConverter(),"^-?\\d+(\\.\\d+)?$\n", 0.0);
-        addValidationOnField(learningRate, new DoubleStringConverter(),"0\\.[1-9]|1", 0.1);
+        addValidationOnField(goal, new DoubleStringConverter(),"0\\.[0-9]+|1", 0.1);
+        addValidationOnField(learningRate, new DoubleStringConverter(),"0\\.[0-9]+|1", 0.1);
         addValidationOnField(sweetnessTestField, new DoubleStringConverter(),"^(?:[1-9](\\.\\d+)?|10)$", 1.0);
 
         dataTable.setItems(fruitRows);
